@@ -6,18 +6,18 @@ from nltk.tokenize import word_tokenize,sent_tokenize
 from nltk import Text
 from nltk.probability import FreqDist
 from StyleFinder import StyleFinder
-
+from sklearn.feature_extraction.text import TfidfTransformer
+import scipy.sparse as sparse
 
 class MassStyles():
     
     
-    def __init__(self,df,quantity,size):
+    def __init__(self,df,quantity):
         # Quantity is just how many rows you want. Size is 'something per X words' where X is size.
         self.df = df.iloc[:quantity]
         self.quantity=quantity
-        self.size=size
         self.StyleArray=None
-        setlf.masterarray = []
+        self.masterarray = []
         self.adjectives = ['JJ','JJR','JJS']
         self.nouns = ['NN','NNS','NNP','NNPS','POS','PRP','PRP$']
         self.nouns_dt = ['NN','NNS','NNP','NNPS','POS','PRP','PRP$','DT']
@@ -36,12 +36,12 @@ class MassStyles():
             arrayrow.append(SF.sentencel_std()) #2
             arrayrow.append(SF.wordl_mean()) #3
             arrayrow.append(SF.wordl_std()) #4
-            arrayrow.append(SF.lex_diversity(self.size)) #5
+            arrayrow.append(SF.lex_diversity(1000)) #5
             #Punctuation frequency
             arrayrow.append(SF.super_frequency(",")) #6
             arrayrow.append(SF.super_frequency(":")) #7
             arrayrow.append(SF.super_frequency(";")) #8
-            arrayrow.append(SF.super_frequency(["\" ","\' "])) #9
+            arrayrow.append(SF.super_frequency(["\"",'\''])) #9
             arrayrow.append(SF.super_frequency("...")) #10
             arrayrow.append(SF.super_frequency("!")) #11
             arrayrow.append(SF.super_frequency("-")) #12
@@ -50,7 +50,7 @@ class MassStyles():
             #Stop word grammar frequency
             arrayrow.append(SF.super_frequency("with",self.adjectives,self.adjectives,cancelvar='negk'))#1
             arrayrow.append(SF.super_frequency("with",self.adjectives,self.adjectives,cancelvar='nega'))#2
-            arrayrow.append(SF.super_frequency("with",'_',self.nouns))#3
+            arrayrow.append(SF.super_frequency("with",'_',self.nouns_dt))#3
             arrayrow.append(SF.super_frequency("and",self.adjectives,self.adjectives))#4
             arrayrow.append(SF.super_frequency("and",["come","go"]))#5
             arrayrow.append(SF.super_frequency("but",'_',"not"))#6
@@ -58,7 +58,7 @@ class MassStyles():
             arrayrow.append(SF.super_frequency("but",'all',self.verbs))#8
             arrayrow.append(SF.super_frequency("but",'all',self.nouns_dt))#9
             arrayrow.append(SF.super_frequency("EX"))#10
-            arrayrow.append(SF.super_frequency("Cause","DT",cancelvar='nega'))#11
+            arrayrow.append(SF.super_frequency(["cause","causes","caused","causing"],"DT",cancelvar='nega'))#11
             arrayrow.append(SF.super_frequency(["however","whyever","whoever","whatever","whenever","wherever"]))#12
             arrayrow.append(SF.super_frequency("said"))#13
             arrayrow.append(SF.super_frequency("while","DT",cancelvar='nega'))#14
@@ -68,7 +68,7 @@ class MassStyles():
             arrayrow.append(SF.super_frequency("as",'_',"JJ"))#18
             arrayrow.append(SF.super_frequency("as",["not","isn't","wasn't","weren't","ain't"]))#19
             arrayrow.append(SF.super_frequency("VBG",['.',',']))#20
-            arrayrow.append(SF.super_frequency("VBG",self.verb))#21
+            arrayrow.append(SF.super_frequency("VBG",self.verbs))#21
             arrayrow.append(SF.super_frequency("VBG",self.adj_dt))#22
             arrayrow.append(SF.super_frequency("VBG",["IN","RB"]))#23
             arrayrow.append(SF.super_frequency(["although","though"],['-',',']))#24
@@ -77,7 +77,7 @@ class MassStyles():
             arrayrow.append(SF.super_frequency(["although","though"],'_',['VBG']))#27
             arrayrow.append(SF.super_frequency("cause",'DT'))#28
             arrayrow.append(SF.super_frequency("that",'IN'))#29
-            arrayrow.append(SF.super_frequency("to",self.nouns))#30
+            arrayrow.append(SF.super_frequency("to",self.nouns_dt))#30
             arrayrow.append(SF.super_frequency("to",self.verbs,self.verbs,cancelvar='negk'))#31
             arrayrow.append(SF.super_frequency("to",self.adjectives))#32
             arrayrow.append(SF.super_frequency("to",'_',self.verbs))#33
@@ -88,7 +88,7 @@ class MassStyles():
             arrayrow.append(SF.super_frequency("if",self.verbs))#38
             arrayrow.append(SF.super_frequency(["would","could","should","might","ought"],'MD',cancelvar="cpos"))#39
             arrayrow.append(SF.super_frequency("just",["RB","MD"],cancelvar="cpos"))#40
-            arrayrow.append(SF.super_frequency("then",["and","."]))#41
+            arrayrow.append(SF.super_frequency("then",["and",".","?","!"]))#41
             arrayrow.append(SF.super_frequency("then",self.nouns,'.'))#42
             arrayrow.append(SF.super_frequency(["there","here"],self.verbs))#43
             arrayrow.append(SF.super_frequency(["there","here"],self.nouns))#44
@@ -97,11 +97,16 @@ class MassStyles():
             arrayrow.append(SF.super_frequency(["you","your","yours"]))#47
             arrayrow.append(SF.super_frequency("might"))#48
             arrayrow.append(SF.super_frequency("maybe"))#49
-            arrayrow.append(SF.super_frequency(['its','it\'s']))#50
+            arrayrow.append(SF.super_frequency('its')+SF.super_frequency('it','_','\'s'))#50
             
             #And set the new row to the current row
             self.StyleArray[row] = arrayrow
         return None
+    
+    def normalize_array(self):
+        TFT = TfidfTransformer()
+        self.StyleArray = TFT.fit_transform(self.StyleArray).toarray()
+        
             
     def pickle_it(self,filename='FicStyleArray'):
         if self.StyleArray is not None:

@@ -16,10 +16,10 @@ class StyleFinder():
         self.sent_len = [len(sentence.split()) for sentence in self.sentences] # Get the length of each sentence
         self.word_len = [len(word) for word in set(self.words)]
         self.poslist = ['CC','CD','DT','EX','FW','IN','JJ',
-                        'JJR','JJS','LS','MD','NN','NNS','NNPS',
-                        'PDT','POS','PRP','PRP$','RB','RBR',
-                        'RBS','RP','TO','UH','VB','VBD','VBG',
-                        'VBN','VBP','VBZ','WDT','WP','WP$','WRB','.']
+                        'JJR','JJS','LS','MD','NN','NNS','NNP',
+                        'NNPS','PDT','POS','PRP','PRP$','RB','RBR',
+                        'RBS','RP','TO','UH','VB','VBD','VBG','VBN',
+                        'VBP','VBZ','WDT','WP','WP$','WRB','.']
         self.postagged = nltk.pos_tag(self.words)
         self.wordcount = len(self.words)
 
@@ -133,7 +133,7 @@ class StyleFinder():
             elif ana == ['_']:
                 counter = self.no_ana(wordy,kata,[a_n,w_n,k_n])
             elif kata == ['_']:
-                counter = self.no_kata(wordy,kata,[a_n,w_n,k_n])
+                counter = self.no_kata(ana,wordy,[a_n,w_n,k_n])
             else:
                 counter = self.negate_none(ana,wordy,kata,[a_n,w_n,k_n])
                 
@@ -143,7 +143,6 @@ class StyleFinder():
     def negate_ana(self,ana,wordy,kata,wak):
         #Takes ana, wordy, and kata, and returns a count of NOT ana, wordy, kata, given the lists.
         counter = []
-
         for i in range(self.wordcount):
             try:
                 if ( not self.uplow_switch(self.postagged[i][wak[0]],wak[0]) in ana 
@@ -164,7 +163,6 @@ class StyleFinder():
     def negate_ana_no_k(self,ana,wordy,wak):
         #Takes ana, wordy, and kata, and returns a count of NOT ana, wordy, given the lists.
         counter = []
-
         for i in range(self.wordcount):
             try:
                 if ( not self.uplow_switch(self.postagged[i][wak[0]],wak[0]) in ana 
@@ -184,7 +182,6 @@ class StyleFinder():
     def negate_kata(self,ana,wordy,kata,wak):
         #Takes ana, wordy, and kata, and returns a count of ana, wordy, NOT kata, given the lists.
         counter = []
-
         for i in range(self.wordcount):
             try:
                 if (self.uplow_switch(self.postagged[i][wak[0]],wak[0]) in ana 
@@ -205,7 +202,6 @@ class StyleFinder():
     def negate_kata_no_a(self,wordy,kata,wak):
         #Takes ana, wordy, and kata, and returns a count of wordy, NOT kata, given the lists.
         counter = []
-
         for i in range(self.wordcount):
             try:
                 if (self.uplow_switch(self.postagged[i][wak[1]],wak[1]) in wordy 
@@ -224,7 +220,6 @@ class StyleFinder():
     def negate_ana_kata(self,ana,wordy,kata,wak):
         #Takes ana, wordy, and kata, and returns a count of NOT ana, wordy, NOT kata, given the lists.
         counter = []
-
         for i in range(self.wordcount):
             try:
                 if (not self.uplow_switch(self.postagged[i][wak[0]],wak[0]) in ana 
@@ -244,7 +239,6 @@ class StyleFinder():
     def negate_none(self,ana,wordy,kata,wak):
         #Takes ana, wordy, and kata, and returns a count of ana, wordy, kata, given the lists.
         counter = []
-
         for i in range(self.wordcount):
             try:
                 if (self.uplow_switch(self.postagged[i][wak[0]],wak[0]) in ana 
@@ -264,7 +258,6 @@ class StyleFinder():
     def no_ana(self,wordy,kata,wak):
         #Takes wordy, and kata, and returns a count of wordy, kata, given the lists.
         counter = []
-
         for i in range(self.wordcount):
             try:
                 if (self.uplow_switch(self.postagged[i][wak[1]],wak[1]) in wordy 
@@ -284,7 +277,6 @@ class StyleFinder():
     def no_kata(self,ana,wordy,wak):
         #Takes wordy, and kata, and returns a count of wordy, kata, given the lists.
         counter = []
-        
         for i in range(self.wordcount):
             try:
                 if (self.uplow_switch(self.postagged[i][wak[0]],wak[0]) in ana 
@@ -300,6 +292,7 @@ class StyleFinder():
 
         return np.sum(counter)
     
+    
     def center_only(self,wordy,wak):
         #Takes wordy and returns a count of wordy, given the lists.
         return np.sum([1 if self.uplow_switch(i[wak[1]],wak[1]) in wordy else 0 for i in self.postagged])
@@ -309,7 +302,6 @@ class StyleFinder():
 
     def center_pos(self,wordy,postag):
         #Takes wordy, and a POS tag and returns a count of wordy, kata, given the lists.
-
         return np.sum([1 if i[0].lower() in wordy and i[1] in postag else 0 for i in self.postagged])
     
     

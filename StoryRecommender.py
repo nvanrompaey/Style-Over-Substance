@@ -23,13 +23,14 @@ class FanficRecommender():
         numt = self.X.shape[0]
         self.v = np.zeros((numt,numt))
         for i in range(numt):
-            v[i] = np.array(cosine_similarity(X[i].reshape(1,-1),X[a].reshape(1,-1)) if i!=a else -1 for a in range(numt)).flatten()
+            self.v[i] = np.array([cosine_similarity(self.X[i].reshape(1,-1),
+                                                    self.X[a].reshape(1,-1)) if i!=a else -1 for a in range(numt)]).flatten()
         return None
     
     def recommend_fic(self,item,n):
         # Time to Recommend, Heretics! Put in a title, get n titles back! Aaaaa!
         ind = self.titles.index(item)
-        recc = np.argsort(v[ind])
+        recc = np.argsort(self.v[ind])
         recclist = [self.titles[i] for i in np.flip(recc[-n:])]
         return recclist
     
