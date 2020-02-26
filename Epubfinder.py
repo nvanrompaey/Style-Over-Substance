@@ -1,6 +1,7 @@
 from epub_conversion.utils import convert_epub_to_lines as CETL
 from epub_conversion.utils import open_book
 import pandas as pd
+import pickle
 from bs4 import BeautifulSoup
 
 def textfinder(name):
@@ -23,4 +24,9 @@ def fic_col_full(df,col,newcol):
     #Takes the whole dataframe and column, then spits out a new colum with the given name
     df2[newcol] = df2[col].apply(lambda x: textfinder(x))
     return df2
-    
+
+def pickle_it(self,file,filename='TotalFicArray'):
+    #And Pickle it!
+    outfile= open(filename,'wb')
+    pickle.dump(file,outfile)
+    outfile.close()
