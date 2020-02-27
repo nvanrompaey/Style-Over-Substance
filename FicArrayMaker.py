@@ -9,7 +9,10 @@ import boto3
 from io import BytesIO
 from MassStylesMini import MassStylesMini
 from nltk.tokenize import word_tokenize
+from concurrent.futures import ProcessPoolExecutor
 import os
+from multiprocessing import cpu_count
+
 
 
 
@@ -29,6 +32,8 @@ columns_list = ["sent_length_mean","sent_length_std",'word_length_mean',"word_le
             "just_freq","then_stop_freq","then_freq","there_verb_freq","there_noun_freq",
             "there_conj_freq","first_person_freq","second_person_freq","might_freq","maybe_freq",
             "its_freq"]
+
+columns_len = len(columns_list)
 
 def unpickle(filename='MiniFicDF',colly=columns_list):
     infile = open(filename,'rb')
@@ -52,7 +57,7 @@ def textfinder(name):
     stream = BytesIO(sobj)
     book = open_book(stream)
     text = CETL(book)
-    soup = BeautifulSoup(" ".join(text))
+    soup = BeautifulSoup(" ".join(text),features="lxml")
     return soup.get_text()
 
 def style_it(text):
@@ -70,6 +75,15 @@ def pickle_it_again(df,filename):
     pickle.dump(df,outfile)
     outfile.close()
     
+def style_featurize(series,lent = columns_len):
+    filename = series
+    text = textfinder(filename)
+    if len(word_tokenize(text))>=1000:
+        style_row = style_it(text)
+    else:
+        style_row = np.empty(lent)
+    
+    return style_row
 
 def main():
     SecondFile = "FicStyleFeatures.pickle"
@@ -78,23 +92,32 @@ def main():
     style_array = []
     #Unpickle the file, then for each row, if there's 1000+ words, perform a Style Analysis and return the row in question.
     # If not, drop the row.
-    for i in df.index.values:
-        filename = df.loc(axis=1)['archive'][i]
-        text = textfinder(filename)
-        if len(word_tokenize(text))>=1000:
-            style_row = style_it(text)
-            style_array.append(style_row)
-        else:
-            df.drop(i,axis=0,inplace=True)
-            
+    print("Array Found... Applying Style Featurization")
+    num = 1
+    max_num = df.index.values.size
+    
+    
+    cpus = cpu_count()-1
+    with ProcessPoolExecutor(max_workers=cpus) as executor:
+        for i in executor.map(style_featurize,df['archive']):
+            num+=1
+            style_array.append(i)
+            if num%1000==0:
+                print(f"{num} of {max_num} stories style-featurized.")
+
+
+    print("Normalizing Style Array...")       
     #Then Normalize the whole array
     style_array = normalize_array(style_array)
     
+    print("Adding to dataframe...")
     #Then slap on the entire array.
     df.iloc(axis=1)[2:] = style_array
     
+    print("Pickling Dataframe...")
     #And pickle the result
     pickle_it_again(df,SecondFile)
+    print("Done.")
         
 
 
