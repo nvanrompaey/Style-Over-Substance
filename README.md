@@ -29,7 +29,7 @@ For the purposes of this recommender I will be using My Little Pony: Friendship 
 
 All of the metadata had already been collected by a third party, and all the stories as of December 2019 had been put into epub files and stored in a hierarchical archive--each metadata item contained an archive path to the epub in question. The Metadata is largely based on what's visible in the following image:
 
-![Facebook Buys Ponyville](https://github.com/nvanrompaey/Style-Over-Substance/tree/master/img/FacebookBuysPonyville.png)
+![Facebook Buys Ponyville](https://github.com/nvanrompaey/Style-Over-Substance/blob/master/img/FacebookBuysPonyville.png "FBP1")
 
 In the upper left we have:
 - The content rating, 'E' for Everyone, is in the corner 
@@ -85,7 +85,7 @@ What this recommender does, is it takes a stop word, and looks backwards and for
 
 See below for an example of what it might look for:
 
-![Fiction Style Comparison](https://github.com/nvanrompaey/Style-Over-Substance/tree/master/img/Grammargraph.png)
+![Fiction Style Comparison](https://github.com/nvanrompaey/Style-Over-Substance/blob/master/img/Grammargraph.png)
 
 The similarity function is looking most for the most important grammatical features--that is, where the greatest stylistic choices appear--and so this recommender has an optional Threshold modification, which can set certain grammar feature frequencies below a certain point to 0 before running a cosine similarity.
 
@@ -108,19 +108,19 @@ Given that I've been looking for a new good read from this site, I can say that 
 
 But that's not enough proof. Here's an example:
 - **A passage from the input fiction**:
-![Facebookfic1](https://github.com/nvanrompaey/Style-Over-Substance/tree/master/img/Facebookfic1.png)
+![Facebookfic1](https://github.com/nvanrompaey/Style-Over-Substance/blob/master/img/Facebookfic1.png)
 - **A passage from the output fiction recommendation**:
-![Daringfic1](https://github.com/nvanrompaey/Style-Over-Substance/tree/master/img/Daringfic1.png)
+![Daringfic1](https://github.com/nvanrompaey/Style-Over-Substance/blob/master/img/Daringfic1.png)
 
 But that's just one example. How about:
 - **A passage from the input fiction**:
-![Facebookfic2](https://github.com/nvanrompaey/Style-Over-Substance/tree/master/img/Facebookfic2.png)
+![Facebookfic2](https://github.com/nvanrompaey/Style-Over-Substance/blob/master/img/Facebookfic2.png)
 - **A passage from the output fiction recommendation**:
-![Daringfic2](https://github.com/nvanrompaey/Style-Over-Substance/tree/master/img/Daringfic2.png)
+![Daringfic2](https://github.com/nvanrompaey/Style-Over-Substance/blob/master/img/Daringfic2.png)
 
 And as an example of a piece of fiction that doesn't match well with these:
 - **A passage from a randomly chosen piece of fiction**:
-![Hourfic1](https://github.com/nvanrompaey/Style-Over-Substance/tree/master/img/HourofTwilightfic1.png)
+![Hourfic1](https://github.com/nvanrompaey/Style-Over-Substance/blob/master/img/HourofTwilightfic1.png)
 
 So, it works fairly well! There's still room for improving the features by expanding and adjusting the grammar tokens, but overall, the style is what was sought, and it appears to recommend fairly well based on that grammar-like stylization.
 
