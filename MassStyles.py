@@ -31,7 +31,7 @@ class MassStyles():
         
         for row in range(self.quantity):
             arrayrow = []
-            SF = StyleFinder(self.df["story_text"].iloc[row]) #-
+            SF = StyleFinder(self.df["story_text"].iloc[row]) #- CHANGE THIS IF YOUR COLUMN NAME CHANGES
             arrayrow.append(SF.sentencel_mean()) #1
             arrayrow.append(SF.sentencel_std()) #2
             arrayrow.append(SF.wordl_mean()) #3
